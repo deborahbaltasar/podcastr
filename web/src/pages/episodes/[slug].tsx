@@ -11,19 +11,19 @@ import { api } from '../../services/api';
 import styles from './episode.module.scss';
 
 type Episode = {
-  id: string,
-  title: string,
-  members: string,
-  publishedAt: string,
-  thumbnail: string,
-  duration: number,
-  durationAsString: string,
-  url: string,
-  description: string,
+  id: string;
+  title: string;
+  members: string;
+  publishedAt: string;
+  thumbnail: string;
+  duration: number;
+  durationAsString: string;
+  url: string;
+  description: string;
 }
 
 type EpisodeProps = {
-  episode: Episode,
+  episode: Episode;
 }
 
 export default function Episode({ episode }: EpisodeProps) {
@@ -56,15 +56,31 @@ export default function Episode({ episode }: EpisodeProps) {
       </header>
 
       <div className={styles.description} dangerouslySetInnerHTML={{ __html: episode.description }} />
-   
+
     </div>
   );
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const { data } = await api.get('episodes', {
+    params: {
+      _limit: 2,
+      _sort: 'published_at',
+      _order: 'desc'
+    }
+  })
+
+  const paths = data.map(episode => {
+    return {
+      params: {
+        slug: episode.id
+      }
+    }
+  })
+
   return {
-    paths: [],
-    fallback: 'blocking'
+    paths,
+    fallback: 'blocking' //incremental static regeneration
   }
 }
 
